@@ -2,7 +2,6 @@ package com.example.jwtDemo.service;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,18 +17,15 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final CustomUserDetailsService customUserDetailsService;
     private final JwtService jwtService;
 
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
                        AuthenticationManager authenticationManager,
-                       CustomUserDetailsService customUserDetailsService,
                        JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
-        this.customUserDetailsService = customUserDetailsService;
         this.jwtService = jwtService;
     }
 
@@ -57,9 +53,17 @@ public class AuthService {
                 )
         );
 
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(request.username());
-        String token = jwtService.generateToken(userDetails);
+        User user = userRepository.findByUsername(request.username())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return new AuthResponse(token, "Bearer", userDetails.getUsername());
+        String token = jwtService.generateToken(
+                org.springframework.security.core.userdetails.User.builder()
+                        .username(user.getUsername())
+                        .password(user.getPassword())
+                        .authorities("ROLE_" + user.getRole())
+                        .build()
+        );
+
+        return new AuthResponse(token, "Bearer", user.getUsername(), user.getRole());
     }
 }

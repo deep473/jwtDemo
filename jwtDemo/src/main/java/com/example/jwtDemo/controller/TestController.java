@@ -11,8 +11,13 @@ public class TestController {
         return "Hello, public endpoint!";
     }
 
-    @GetMapping("/hi")
-    public String hi() {
-        return "Hi, protected endpoint!";
+    @GetMapping("/customer/home")
+    public String customerHome() {
+        return "Welcome Customer!";
+    }
+
+    @GetMapping("/admin/home")
+    public String adminHome() {
+        return "Welcome Admin!";
     }
 }
