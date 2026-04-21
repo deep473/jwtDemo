@@ -38,17 +38,19 @@ public class SecurityConfig {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                        "/", "/index.html",
-                        "/signup.html", "/login.html", "/admin-login.html",
-                        "/customer-home.html", "/admin-home.html",
-                        "/css/**", "/js/**"
-                ).permitAll()
-                .requestMatchers("/auth/**", "/hello").permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/customer/**").hasAnyRole("USER", "ADMIN")
-                .anyRequest().authenticated()
-            )
+            	    .requestMatchers(
+            	            "/", "/index.html",
+            	            "/signup.html", "/login.html", "/admin-login.html",
+            	            "/customer-home.html", "/admin-home.html",
+            	            "/add-product.html", "/all-products-admin.html",
+            	            "/edit-product.html", "/view-product-admin.html",
+            	            "/css/**", "/js/**"
+            	    ).permitAll()
+            	    .requestMatchers("/auth/**", "/hello").permitAll()
+            	    .requestMatchers("/admin/**").hasRole("ADMIN")
+            	    .requestMatchers("/customer/**").hasAnyRole("USER", "ADMIN")
+            	    .anyRequest().authenticated()
+            	)
             .authenticationProvider(authenticationProvider)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .formLogin(form -> form.disable())

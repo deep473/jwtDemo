@@ -7,10 +7,18 @@
 </head>
 <body>
   <div class="container">
-    <h1>Admin Home</h1>
+    <h1>Admin Dashboard</h1>
     <p id="welcomeText"></p>
-    <button onclick="loadAdminData()">Load Admin Data</button>
-    <button onclick="logout()">Logout</button>
+
+    <div class="actions">
+      <a href="/add-product.html">Add Product</a>
+      <a href="/all-products-admin.html">View All Products</a>
+      <button onclick="logout()">Logout</button>
+    </div>
+
+    <hr />
+
+    <button onclick="loadAdminData()">Load Admin API Test</button>
     <p id="apiResult"></p>
   </div>
 
