@@ -36,3 +36,29 @@ button, a {
 p {
   margin-top: 12px;
 }
+.product-image-preview {
+  width: 220px;
+  height: 220px;
+  max-width: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-top: 10px;
+}
+.wide-container {
+  width: 85%;
+  max-width: 1100px;
+}
+
+.section-title {
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+.product-thumb {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}

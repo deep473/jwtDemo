@@ -130,7 +130,8 @@ async function loadProductDetails() {
     <p><strong>Price:</strong> ${product.price}</p>
     <p><strong>Stock:</strong> ${product.stock}</p>
     <p><strong>Category:</strong> ${product.category}</p>
-    <p><strong>Image:</strong> <img src="${product.imageUrl ?? ""}" /></p>
+    <p><strong>Image:</strong></p>
+    <img class="product-image-preview" src="${product.imageUrl || ""}" alt="${product.name}" />
   `;
 }
 /*

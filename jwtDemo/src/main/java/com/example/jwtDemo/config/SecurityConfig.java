@@ -41,13 +41,14 @@ public class SecurityConfig {
             	    .requestMatchers(
             	            "/", "/index.html",
             	            "/signup.html", "/login.html", "/admin-login.html",
-            	            "/customer-home.html", "/admin-home.html",
+            	            "/customer-home.html", "/view-cart.html", "/admin-home.html",
             	            "/add-product.html", "/all-products-admin.html",
             	            "/edit-product.html", "/view-product-admin.html",
             	            "/css/**", "/js/**"
             	    ).permitAll()
             	    .requestMatchers("/auth/**", "/hello").permitAll()
             	    .requestMatchers("/admin/**").hasRole("ADMIN")
+            	    .requestMatchers("/products/**").hasAnyRole("USER", "ADMIN")
             	    .requestMatchers("/customer/**").hasAnyRole("USER", "ADMIN")
             	    .anyRequest().authenticated()
             	)

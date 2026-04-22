@@ -6,12 +6,20 @@
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
-  <div class="container">
+  <div class="container wide-container">
     <h1>Customer Home</h1>
     <p id="welcomeText"></p>
-    <button onclick="loadCustomerData()">Load Customer Data</button>
-    <button onclick="logout()">Logout</button>
-    <p id="apiResult"></p>
+
+    <div class="actions">
+      <button onclick="startShopping()">Start Shopping</button>
+      <button onclick="goToCart()">View Cart</button>
+      <button onclick="logout()">Logout</button>
+    </div>
+
+    <div id="shoppingSection" style="display: none;">
+      <h2 class="section-title">Available Products</h2>
+      <div id="productList"></div>
+    </div>
   </div>
 
   <script src="/js/customer.js"></script>
