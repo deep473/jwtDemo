@@ -55,10 +55,34 @@ p {
   margin-bottom: 20px;
 }
 
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: white;
+}
+
+.product-table th,
+.product-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: center;
+}
+
+.product-table th {
+  background: #f0f4ff;
+}
+
 .product-thumb {
   width: 70px;
   height: 70px;
   object-fit: cover;
   border-radius: 8px;
   border: 1px solid #ddd;
+}
+
+.empty-state {
+  margin-top: 20px;
+  font-size: 18px;
+  color: #666;
 }

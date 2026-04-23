@@ -3,7 +3,7 @@ function ensureCustomer() {
   const role = localStorage.getItem("role");
   const username = localStorage.getItem("username");
 
-  if (!token || (role !== "USER" && role !== "ADMIN")) {
+  if (!token || role !== "USER") {
     window.location.replace("/login.html");
     return false;
   }
@@ -28,6 +28,10 @@ function goToCart() {
   window.location.href = "/view-cart.html";
 }
 
+function goBackToShopping() {
+  window.location.href = "/customer-home.html";
+}
+
 async function loadProducts() {
   const response = await fetch("/products", {
     headers: {
@@ -35,8 +39,13 @@ async function loadProducts() {
     }
   });
 
-  if (response.status === 401 || response.status === 403) {
+  if (response.status === 401) {
     logout();
+    return;
+  }
+
+  if (response.status === 403) {
+    alert("Access denied to products");
     return;
   }
 
@@ -52,14 +61,13 @@ async function loadProducts() {
   }
 
   let html = `
-    <table border="1" cellpadding="10" cellspacing="0" width="100%">
+    <table class="product-table">
       <tr>
-        <th>ID</th>
+        <th>Image</th>
         <th>Name</th>
         <th>Price</th>
         <th>Stock</th>
         <th>Category</th>
-        <th>Image</th>
         <th>Action</th>
       </tr>
   `;
@@ -67,20 +75,15 @@ async function loadProducts() {
   products.forEach(product => {
     html += `
       <tr>
-        <td>${product.id}</td>
+        <td>
+          <img src="${product.imageUrl || ''}" alt="${product.name}" class="product-thumb" />
+        </td>
         <td>${product.name}</td>
-        <td>${product.price}</td>
+        <td>₹${product.price}</td>
         <td>${product.stock}</td>
         <td>${product.category}</td>
         <td>
-          <img 
-            src="${product.imageUrl || ''}" 
-            alt="${product.name}" 
-            class="product-thumb"
-          />
-        </td>
-        <td>
-          <button onclick="addToCartPlaceholder('${product.name}')">Add to Cart</button>
+          <button onclick="addToCart(${product.id})">Add to Cart</button>
         </td>
       </tr>
     `;
@@ -90,8 +93,149 @@ async function loadProducts() {
   productList.innerHTML = html;
 }
 
-function addToCartPlaceholder(productName) {
-  alert(`${productName} will be added to cart later.`);
+async function addToCart(productId) {
+  const response = await fetch("/customer/cart", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + getToken()
+    },
+    body: JSON.stringify({
+      productId: productId,
+      quantity: 1
+    })
+  });
+
+  const result = await response.json().catch(() => ({}));
+
+  if (response.status === 401) {
+    logout();
+    return;
+  }
+
+  if (!response.ok) {
+    alert(result.message || "Failed to add product to cart");
+    return;
+  }
+
+  alert(result.message || "Product added to cart");
+}
+
+async function loadCart() {
+  const response = await fetch("/customer/cart", {
+    headers: {
+      "Authorization": "Bearer " + getToken()
+    }
+  });
+
+  if (response.status === 401) {
+    logout();
+    return;
+  }
+
+  if (response.status === 403) {
+    alert("Access denied to cart");
+    return;
+  }
+
+  const cart = await response.json();
+  const cartList = document.getElementById("cartList");
+  const cartTotal = document.getElementById("cartTotal");
+  const checkoutBtn = document.getElementById("checkoutBtn");
+
+  if (!cartList) return;
+
+  if (!cart.items.length) {
+    cartList.innerHTML = "<p class='empty-state'>Your cart is empty</p>";
+    cartTotal.innerText = "";
+    if (checkoutBtn) checkoutBtn.style.display = "none";
+    return;
+  }
+
+  let html = `
+    <table class="product-table">
+      <tr>
+        <th>Image</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Subtotal</th>
+        <th>Actions</th>
+      </tr>
+  `;
+
+  cart.items.forEach(item => {
+    html += `
+      <tr>
+        <td>
+          <img src="${item.imageUrl || ''}" alt="${item.productName}" class="product-thumb" />
+        </td>
+        <td>${item.productName}</td>
+        <td>₹${item.price}</td>
+        <td>
+          <input type="number" min="1" value="${item.quantity}" id="qty-${item.cartItemId}" style="width: 70px;" />
+        </td>
+        <td>₹${item.subtotal}</td>
+        <td>
+          <button onclick="updateCartItem(${item.cartItemId})">Update</button>
+          <button onclick="removeCartItem(${item.cartItemId})">Remove</button>
+        </td>
+      </tr>
+    `;
+  });
+
+  html += "</table>";
+
+  cartList.innerHTML = html;
+  cartTotal.innerText = `Total: ₹${cart.totalAmount}`;
+}
+
+async function updateCartItem(cartItemId) {
+  const quantity = document.getElementById(`qty-${cartItemId}`).value;
+
+  const response = await fetch(`/customer/cart/${cartItemId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + getToken()
+    },
+    body: JSON.stringify({
+      quantity: Number(quantity)
+    })
+  });
+
+  const result = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    alert(result.message || "Failed to update cart item");
+    return;
+  }
+
+  alert(result.message || "Cart updated");
+  loadCart();
+}
+
+async function removeCartItem(cartItemId) {
+  const response = await fetch(`/customer/cart/${cartItemId}`, {
+    method: "DELETE",
+    headers: {
+      "Authorization": "Bearer " + getToken()
+    }
+  });
+
+  const result = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    alert(result.message || "Failed to remove cart item");
+    return;
+  }
+
+  alert(result.message || "Item removed from cart");
+  loadCart();
+}
+
+function checkout() {
+  alert("Order / buy functionality will be implemented next.");
 }
 
 function logout() {
@@ -102,5 +246,9 @@ function logout() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  ensureCustomer();
+  if (!ensureCustomer()) return;
+
+  if (document.getElementById("cartList")) {
+    loadCart();
+  }
 });

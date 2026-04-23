@@ -6,14 +6,18 @@
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
-  <div class="container">
+  <div class="container wide-container">
     <h1>My Cart</h1>
-    <p>This page is under construction.</p>
+    <p id="welcomeText"></p>
 
     <div class="actions">
-      <a href="/customer-home.html">Back to Shopping</a>
+      <button onclick="goBackToShopping()">Back to Shopping</button>
       <button onclick="logout()">Logout</button>
     </div>
+
+    <div id="cartList"></div>
+    <h3 id="cartTotal"></h3>
+    <button id="checkoutBtn" onclick="checkout()">Proceed to Buy</button>
   </div>
 
   <script src="/js/customer.js"></script>
