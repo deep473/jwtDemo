@@ -1,0 +1,84 @@
+package com.example.jwtDemo.entity;
+
+import java.math.BigDecimal;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "purchase_orders")
+public class PurchaseOrder {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal totalAmount;
+
+    @Column(nullable = false)
+    private String currency;
+
+    @Column(nullable = false)
+    private String status;
+
+    @Column(unique = true)
+    private String razorpayOrderId;
+
+    public PurchaseOrder() {
+    }
+
+    public PurchaseOrder(User user, BigDecimal totalAmount, String currency, String status) {
+        this.user = user;
+        this.totalAmount = totalAmount;
+        this.currency = currency;
+        this.status = status;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public String getRazorpayOrderId() {
+        return razorpayOrderId;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setRazorpayOrderId(String razorpayOrderId) {
+        this.razorpayOrderId = razorpayOrderId;
+    }
+}

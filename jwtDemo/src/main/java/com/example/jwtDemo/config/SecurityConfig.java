@@ -49,6 +49,7 @@ public class SecurityConfig {
             	    ).permitAll()
             	    .requestMatchers("/auth/**", "/hello").permitAll()
             	    .requestMatchers("/customer/cart/**").hasRole("USER")
+            	    .requestMatchers("/customer/payment/**").hasRole("USER")
             	    .requestMatchers("/products/**").hasAnyRole("USER", "ADMIN")
             	    .requestMatchers("/admin/**").hasRole("ADMIN")
             	    .requestMatchers("/customer/**").hasAnyRole("USER", "ADMIN")

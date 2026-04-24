@@ -234,8 +234,80 @@ async function removeCartItem(cartItemId) {
   loadCart();
 }
 
-function checkout() {
-  alert("Order / buy functionality will be implemented next.");
+async function checkout() {
+  if (typeof Razorpay === "undefined") {
+    alert("Razorpay SDK not loaded");
+    return;
+  }
+
+  const createOrderResponse = await fetch("/customer/payment/create-order", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer " + getToken()
+    }
+  });
+
+  if (createOrderResponse.status === 401) {
+    logout();
+    return;
+  }
+
+  const orderData = await createOrderResponse.json().catch(() => ({}));
+
+  if (!createOrderResponse.ok) {
+    alert(orderData.message || "Failed to create payment order");
+    return;
+  }
+
+  const username = localStorage.getItem("username") || "Customer";
+
+  const options = {
+    key: orderData.keyId,
+    amount: orderData.amount,
+    currency: orderData.currency,
+    name: "JWT Demo Store",
+    description: "Cart Payment",
+    order_id: orderData.razorpayOrderId,
+    handler: async function (response) {
+      const verifyResponse = await fetch("/customer/payment/verify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + getToken()
+        },
+        body: JSON.stringify({
+          localOrderId: orderData.localOrderId,
+          razorpayPaymentId: response.razorpay_payment_id,
+          razorpayOrderId: response.razorpay_order_id,
+          razorpaySignature: response.razorpay_signature
+        })
+      });
+
+      const verifyResult = await verifyResponse.json().catch(() => ({}));
+
+      if (!verifyResponse.ok) {
+        alert(verifyResult.message || "Payment verification failed");
+        return;
+      }
+
+      alert(verifyResult.message || "Payment successful");
+      window.location.href = "/customer-home.html";
+    },
+    prefill: {
+      name: username
+    },
+    theme: {
+      color: "#2563eb"
+    }
+  };
+
+  const rzp = new Razorpay(options);
+
+  rzp.on("payment.failed", function () {
+    alert("Payment failed");
+  });
+
+  rzp.open();
 }
 
 function logout() {
